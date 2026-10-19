@@ -1,0 +1,10 @@
+{
+  "name": "JARVIS — Assistant personnel",
+  "short_name": "JARVIS",
+  "description": "Prototype d'assistant personnel",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#06101d",
+  "theme_color": "#07111f",
+  "icons": []
+}

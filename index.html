@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JARVIS">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>JARVIS — Assistant personnel</title>
+  <style>
+    :root{color-scheme:dark;--bg:#06101d;--panel:#0c1b2d;--panel2:#10243a;--line:#1b3c58;--cyan:#5ee7ff;--blue:#459cff;--text:#edf7ff;--muted:#91a8bd;--danger:#ff7e88}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 50% -20%,#14385a 0%,var(--bg) 58%);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100dvh}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .app{max-width:760px;margin:auto;min-height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+    header{display:flex;align-items:center;gap:12px;padding:18px 2px 14px;border-bottom:1px solid #19364e}
+    .orb{width:46px;height:46px;border:1px solid var(--cyan);border-radius:50%;display:grid;place-items:center;box-shadow:0 0 22px #3bcaff36,inset 0 0 18px #3bcaff20;color:var(--cyan);font-size:21px}
+    h1{font-size:20px;letter-spacing:.22em;margin:0} .sub{color:var(--muted);font-size:12px;letter-spacing:.08em}
+    .status{margin-left:auto;font-size:11px;color:#9becc9;display:flex;align-items:center;gap:6px}.dot{width:7px;height:7px;border-radius:50%;background:#6be6a5;box-shadow:0 0 10px #6be6a5}
+    .toolbar{display:flex;gap:8px;padding:12px 0}.smallbtn{border:1px solid var(--line);background:#0b1a2a;color:var(--text);padding:8px 11px;border-radius:12px;font-size:13px}
+    .hero{text-align:center;padding:17px 8px 12px}.reactor{margin:0 auto 12px;width:96px;height:96px;border:1px solid #367fa5;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#174e72 0%,#0b2136 52%,#071321 72%);box-shadow:0 0 0 7px #12324b55,0 0 34px #27c7ff20;position:relative}
+    .reactor:before,.reactor:after{content:"";position:absolute;border:1px solid #50cfff55;border-radius:50%;inset:-7px;transform:rotate(30deg)}.reactor:after{inset:7px;border-style:dashed;animation:spin 20s linear infinite}
+    @keyframes spin{to{transform:rotate(390deg)}} .hero h2{font-size:18px;margin:0 0 3px;font-weight:600}.hero p{margin:0;color:var(--muted);font-size:13px}
+    .notice{border:1px solid #715d2b;background:#2a2414;color:#f3d89b;border-radius:12px;padding:10px 12px;font-size:12px;margin:8px 0 12px}
+    #chat{flex:1;min-height:180px;display:flex;flex-direction:column;gap:12px;padding:8px 0 14px}
+    .msg{max-width:88%;padding:11px 13px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}.assistant{align-self:flex-start;background:linear-gradient(135deg,#10283d,#0c1c2d);border:1px solid #1a4865;border-bottom-left-radius:5px}.user{align-self:flex-end;background:#123e62;border:1px solid #246b9b;border-bottom-right-radius:5px}.who{font-size:10px;color:var(--cyan);letter-spacing:.1em;margin-bottom:4px}.user .who{color:#b6d8ff}
+    .composer{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 15%);padding:12px 0 calc(12px + env(safe-area-inset-bottom));}
+    .entry{display:flex;gap:8px;align-items:flex-end;background:#0b1b2b;border:1px solid #244762;border-radius:18px;padding:7px}.entry textarea{flex:1;resize:none;border:0;outline:0;background:transparent;color:var(--text);min-height:42px;max-height:130px;padding:10px 7px}.iconbtn{border:1px solid #2c5d7e;background:#102c44;color:var(--cyan);width:43px;height:43px;border-radius:14px;font-size:18px;flex-shrink:0}.send{background:linear-gradient(135deg,#1483b9,#2569bd);color:white;border:0}.iconbtn.active{background:#632d39;color:#fff;border-color:#ff8995}.hint{text-align:center;color:#718ba1;font-size:11px;margin-top:8px}
+    .panel{display:none;background:#0b1b2b;border:1px solid var(--line);border-radius:16px;padding:15px;margin:4px 0 14px}.panel.open{display:block}.panel h3{margin:0 0 12px;font-size:16px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label{font-size:12px;color:var(--muted)}.field input,.field select{width:100%;background:#071321;color:var(--text);border:1px solid #2a4c66;border-radius:10px;padding:10px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}.warn{color:#ffb9bf;font-size:12px}.footer{text-align:center;color:#617a90;font-size:10px;padding:2px 0 8px}
+    @media(min-width:600px){.app{padding-left:22px;padding-right:22px}.hero{padding-top:24px}.reactor{width:110px;height:110px}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="orb">✦</div>
+    <div><h1>JARVIS</h1><div class="sub">ASSISTANT PERSONNEL · PROTOTYPE 01</div></div>
+    <div class="status"><span class="dot"></span> EN LIGNE LOCAL</div>
+  </header>
+  <div class="toolbar">
+    <button class="smallbtn" id="settingsBtn">⚙ Personnaliser</button>
+    <button class="smallbtn" id="clearBtn">Effacer le chat</button>
+    <button class="smallbtn" id="stopBtn">■ Stop voix</button>
+  </div>
+  <section class="hero">
+    <div class="reactor">✧</div>
+    <h2>À ton service.</h2>
+    <p id="greeting">Interface prête · mode démonstration</p>
+  </section>
+  <div class="notice">Version 0.1 : le chat fonctionne en démonstration sur ton appareil. Elle n'est pas encore reliée à un vrai modèle d'IA ni à Internet. La voix dépend de la compatibilité de Safari.</div>
+  <section class="panel" id="settings">
+    <h3>Personnaliser JARVIS</h3>
+    <div class="field"><label for="nickname">Comment JARVIS doit-il t'appeler ?</label><input id="nickname" maxlength="40" placeholder="Ex. Ethan"></div>
+    <div class="field"><label for="tone">Personnalité</label><select id="tone"><option value="naturel">Naturel et amical</option><option value="pro">Professionnel et efficace</option><option value="fun">Drôle et détendu</option><option value="butler">Majordome calme façon science-fiction</option></select></div>
+    <div class="field"><label for="voiceSelect">Voix de réponse (si disponible)</label><select id="voiceSelect"><option value="">Voix française par défaut</option></select></div>
+    <div class="row"><button class="smallbtn" id="saveSettings">Enregistrer</button><button class="smallbtn" id="forgetBtn">Effacer mémoire locale</button></div>
+    <p class="warn">Les préférences et l'historique restent dans le stockage local de ce navigateur. Effacer les données du site peut les supprimer.</p>
+  </section>
+  <main id="chat" aria-live="polite"></main>
+  <div class="composer">
+    <div class="entry">
+      <button class="iconbtn" id="micBtn" aria-label="Dicter un message" title="Dicter">🎙</button>
+      <textarea id="prompt" rows="1" placeholder="Écris à JARVIS…"></textarea>
+      <button class="iconbtn send" id="sendBtn" aria-label="Envoyer">➤</button>
+    </div>
+    <div class="hint" id="voiceHint">🎙 Appuie sur le micro pour dicter · ➤ pour envoyer</div>
+  </div>
+  <div class="footer">JARVIS personnel · prototype privé · aucune clé API intégrée</div>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const STORAGE = "jarvis-proto-v1";
+  const defaultState = { nickname:"", tone:"butler", messages:[], notes:[] };
+  let state = {...defaultState};
+  try { state = {...defaultState, ...JSON.parse(localStorage.getItem(STORAGE) || "{}")}; } catch(e) {}
+  let recognition = null, listening = false, voices = [];
+  const chat = $("chat");
+  const save = () => { try { localStorage.setItem(STORAGE, JSON.stringify(state)); } catch(e) {} };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function addMessage(role, text, persist=true) {
+    const item = {role, text, time:Date.now()};
+    if (persist) { state.messages.push(item); state.messages = state.messages.slice(-100); save(); }
+    renderMessage(item);
+  }
+  function renderMessage(m) {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.role === "user" ? "user" : "assistant");
+    const who = document.createElement("div"); who.className = "who"; who.textContent = m.role === "user" ? (state.nickname || "TOI").toUpperCase() : "JARVIS";
+    const body = document.createElement("div"); body.textContent = m.text;
+    div.append(who, body); chat.appendChild(div); chat.scrollTop = chat.scrollHeight;
+  }
+  function render() { chat.innerHTML = ""; state.messages.forEach(renderMessage); }
+  function intro() {
+    if (!state.messages.length) addMessage("assistant", `Bonjour${state.nickname ? " " + state.nickname : ""}. Je suis JARVIS. Pour le moment, je fonctionne en mode démonstration : je peux tester le chat, la dictée et la lecture vocale, mais mon cerveau IA connecté reste à installer. Que souhaites-tu tester ?`);
+  }
+  function speak(text) {
+    if (!("speechSynthesis" in window)) { $("voiceHint").textContent = "La lecture vocale n'est pas prise en charge par ce navigateur."; return; }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "fr-FR";
+    const chosen = $("voiceSelect").value;
+    const voice = voices.find(v => v.name === chosen);
+    if (voice) utter.voice = voice;
+    utter.rate = state.tone === "butler" ? 0.92 : 1;
+    window.speechSynthesis.speak(utter);
+  }
+  function demoReply(text) {
+    const t = text.toLowerCase();
+    if (/\b(bonjour|salut|hello|coucou)\b/.test(t)) return `Bonjour${state.nickname ? " " + state.nickname : ""}. Je suis opérationnel pour cette démonstration.`;
+    if (t.includes("qui es-tu") || t.includes("qui est tu") || t.includes("ton nom")) return "Je suis JARVIS, ton assistant personnel en cours de construction. Mon interface est prête, mais je ne suis pas encore relié à un modèle d'IA.";
+    if (t.includes("mémorise") || t.includes("souviens-toi") || t.includes("retiens")) {
+      const note = text.replace(/^(jarvis[, ]*)?(mémorise|souviens-toi|retiens)( que)?\s*/i,"").trim();
+      if (note) { state.notes.push(note); save(); return `Je l'ai ajouté à la mémoire locale de ce prototype : « ${note} ». Cette mémoire reste sur ce navigateur.`; }
+      return "Dis par exemple : « Mémorise que je préfère les réponses courtes ». Tu pourras effacer cette mémoire dans Personnaliser.";
+    }
+    if (t.includes("mémoire") || t.includes("souviens")) return state.notes.length ? "Voici ma mémoire locale :\n• " + state.notes.join("\n• ") : "Ma mémoire locale est vide. Tu peux me demander de mémoriser une préférence.";
+    if (t.includes("aide") || t.includes("que peux-tu faire")) return "Pour l'instant, je peux tester les messages, la dictée vocale, la lecture à voix haute, les réglages et une petite mémoire locale. La prochaine étape sera de me connecter à un vrai modèle d'IA et à des outils Internet.";
+    const style = {
+      naturel: "Je vois ce que tu veux dire. Pour te répondre intelligemment, il faudra connecter mon modèle d'IA. ",
+      pro: "Demande reçue. Le moteur de démonstration ne peut pas analyser cette demande en profondeur. ",
+      fun: "Bien reçu ! Mon cerveau complet est encore en chantier. ",
+      butler: "Bien reçu. Je dois toutefois préciser que mon moteur d'intelligence connecté n'est pas encore installé. "
+    }[state.tone] || "";
+    return style + "Pour le moment, cette version ne génère pas de réponses par IA : elle sert à vérifier l'interface et la voix. Ton message était : « " + text + " ». ";
+  }
+  function send(text) {
+    text = (text || $("prompt").value).trim(); if (!text) return;
+    $("prompt").value = ""; $("prompt").style.height = "auto";
+    addMessage("user", text);
+    const reply = demoReply(text);
+    setTimeout(() => { addMessage("assistant", reply); speak(reply); }, 250);
+  }
+  $("sendBtn").addEventListener("click", () => send());
+  $("prompt").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("prompt").addEventListener("input", e => { e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,130)+"px"; });
+  $("settingsBtn").addEventListener("click", () => $("settings").classList.toggle("open"));
+  $("clearBtn").addEventListener("click", () => { if (confirm("Effacer l'historique de chat ?")) { state.messages=[]; save(); chat.innerHTML=""; intro(); } });
+  $("stopBtn").addEventListener("click", () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); if (recognition && listening) recognition.stop(); });
+  $("saveSettings").addEventListener("click", () => {
+    state.nickname = $("nickname").value.trim(); state.tone = $("tone").value; save();
+    $("greeting").textContent = `Paramètres enregistrés${state.nickname ? " · Bonjour " + state.nickname : ""}`;
+    $("settings").classList.remove("open");
+    addMessage("assistant", `Paramètres mis à jour${state.nickname ? ", " + state.nickname : ""}. Je garderai cette personnalité dans ce navigateur.`);
+  });
+  $("forgetBtn").addEventListener("click", () => { if (confirm("Effacer la mémoire locale et les préférences ?")) { state.notes=[]; state.nickname=""; state.tone="butler"; save(); $("nickname").value=""; $("tone").value="butler"; addMessage("assistant","Mémoire locale et préférences effacées."); }});
+  function loadVoices() {
+    if (!("speechSynthesis" in window)) return;
+    voices = window.speechSynthesis.getVoices();
+    const sel = $("voiceSelect"); sel.innerHTML = '<option value="">Voix française par défaut</option>';
+    voices.filter(v => v.lang.toLowerCase().startsWith("fr")).forEach(v => { const o=document.createElement("option"); o.value=v.name; o.textContent=v.name; sel.appendChild(o); });
+  }
+  if ("speechSynthesis" in window) { loadVoices(); window.speechSynthesis.onvoiceschanged = loadVoices; }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition(); recognition.lang="fr-FR"; recognition.interimResults=false; recognition.continuous=false;
+    recognition.onstart=()=>{listening=true;$("micBtn").classList.add("active");$("voiceHint").textContent="J'écoute… parle maintenant";};
+    recognition.onend=()=>{listening=false;$("micBtn").classList.remove("active");$("voiceHint").textContent="🎙 Appuie sur le micro pour dicter · ➤ pour envoyer";};
+    recognition.onerror=()=>{$("voiceHint").textContent="Micro indisponible. Vérifie l'autorisation du navigateur ou écris ton message.";};
+    recognition.onresult=e=>{const said=e.results[0][0].transcript;$("prompt").value=said;send(said);};
+    $("micBtn").addEventListener("click",()=>{try{if(listening)recognition.stop();else recognition.start();}catch(e){$("voiceHint").textContent="Impossible de lancer le micro. Réessaie."; }});
+  } else {
+    $("micBtn").addEventListener("click",()=>{$("voiceHint").textContent="La dictée vocale n'est pas prise en charge ici. Essaie la dictée du clavier iPhone.";});
+    $("voiceHint").textContent="Dictée du clavier iPhone disponible · lecture vocale selon Safari";
+  }
+  $("nickname").value=state.nickname || ""; $("tone").value=state.tone || "butler";
+  render(); intro();
+})();
+</script>
+</body>
+</html>
